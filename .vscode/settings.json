@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./google_auth_services"
+    ]
+}
