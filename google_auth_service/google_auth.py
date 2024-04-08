@@ -1,19 +1,18 @@
 from flask import Blueprint, session, abort, redirect, request, url_for
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
-from pip._vendor import cachecontrol
+from google.auth.transport.requests import Request
+import cachecontrol
 import google.auth.transport.requests
 import os
 import pathlib
 import requests
 
-# Tạo một blueprint mới với tên là google_auth_bp
 google_auth_bp = Blueprint("google_auth", __name__)
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 GOOGLE_CLIENT_ID = "48603665006-p0tkod3fl4iskfs52b8ear7ruhgg5acu.apps.googleusercontent.com"
-# google_auth_service_path = os.path.join(pathlib.Path(__file__).parent, "google_auth_service")
 client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
 
 flow = Flow.from_client_secrets_file(
@@ -65,7 +64,7 @@ def callback():
 @google_auth_bp.route("/logout")
 def logout():
     session.clear()
-    return redirect("/")
+    return redirect(url_for("google_auth.login"))  # Redirect to login page after logout
 
 @google_auth_bp.route("/")
 def index():
