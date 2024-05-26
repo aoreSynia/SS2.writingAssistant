@@ -11,7 +11,11 @@ import google.auth.transport.requests
 
 google_auth_bp = Blueprint("google_auth", __name__)
 
-app = Flask(__name__)
+app = Flask(
+    __name__, 
+    template_folder="web/templates", 
+    static_folder="web/static"
+)
 app.secret_key = '!secret'
 app.config.from_object('config')  # Remove this line
 
