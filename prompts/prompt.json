@@ -1,0 +1,36 @@
+{
+    "grammar_check": {
+        "prompt": " Check grammar and spelling in the following text. Highlight the incorrect parts and provide corrections in the format 'start, end, incorrect, suggestion'. Example format: 'start: 0, end: 2, incorrect: *he*, suggestion: *He*'. Here is the text: {{text}}",
+        "outputParsingPattern": "start: (\\d+), end: (\\d+), incorrect: \\*(.*?)\\*, suggestion: \\*(.*?)\\*",
+        "outputParsingReplacement": {
+            "start": "$1",
+            "end": "$2",
+            "incorrect": "$3",
+            "suggestion": "$4"
+        }
+    },
+    "plagiarism_check": {
+        "prompt": "  Check the following text for plagiarism. Highlight the plagiarized parts and provide suggestions in the format 'plagiarized -> suggestion'. Example format: 'highlighted_text: *he* copied this *text* errors: he -> He, text -> paragraph.' Here is the text: {{text}}",
+        "outputParsingPattern": "highlighted_text: (.*?) errors: (.*)$",
+        "outputParsingReplacement": {
+            "highlighted_text": "$1",
+            "errors": "$2"
+        }
+    },
+    "text_completion": {
+        "prompt": "Complete the following text and highlight your additions. Provide the result in the format 'highlighted_text: *completed text*' and 'errors: added -> added text'. Example format: 'highlighted_text: This is a *new sentence* errors: new sentence -> This is a new sentence.' Here is the text: {{text}}",
+        "outputParsingPattern": "highlighted_text: (.*?) errors: (.*)$",
+        "outputParsingReplacement": {
+            "highlighted_text": "$1",
+            "errors": "$2"
+        }
+    },
+    "paraphrasing": {
+        "prompt": " Paraphrase the following text. Highlight the paraphrased parts and provide the original to paraphrased mapping in the format 'original -> paraphrased'. Example format: 'highlighted_text: This is a *rephrased sentence* errors: rephrased sentence -> This is a rephrased sentence.' Here is the text: {{text}}",
+        "outputParsingPattern": "highlighted_text: (.*?) errors: (.*)$",
+        "outputParsingReplacement": {
+            "highlighted_text": "$1",
+            "errors": "$2"
+        }
+    }
+}
