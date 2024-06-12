@@ -1,36 +1,37 @@
 {
     "grammar_check": {
-        "prompt": " Check grammar and spelling in the following text. Highlight the incorrect parts and provide corrections in the format 'start, end, incorrect, suggestion'. Example format: 'start: 0, end: 2, incorrect: *he*, suggestion: *He*'. Here is the text: {{text}}",
-        "outputParsingPattern": "start: (\\d+), end: (\\d+), incorrect: \\*(.*?)\\*, suggestion: \\*(.*?)\\*",
+        "prompt": "Check grammar and spelling in the following text: {{text}}. Highlight errors with asterisk *incorrect part* and provide corrections in the format 'start, end, incorrect, suggestion, error_type, severity'. Example format: 'start: 0, end: 2, incorrect: *he*, suggestion: *He*, error_type: grammar, severity: minor'.",
+        "outputParsingPattern": "start: (\\d+), end: (\\d+), incorrect: \\*(.*?)\\*, suggestion: \\*(.*?)\\*, error_type: (.*?), severity: (.*?)",
         "outputParsingReplacement": {
             "start": "$1",
             "end": "$2",
             "incorrect": "$3",
-            "suggestion": "$4"
+            "suggestion": "$4",
+            "error_type": "$5",
+            "severity": "$6"
         }
     },
     "plagiarism_check": {
-        "prompt": "  Check the following text for plagiarism. Highlight the plagiarized parts and provide suggestions in the format 'plagiarized -> suggestion'. Example format: 'highlighted_text: *he* copied this *text* errors: he -> He, text -> paragraph.' Here is the text: {{text}}",
-        "outputParsingPattern": "highlighted_text: (.*?) errors: (.*)$",
+        "prompt": "Check the following text for plagiarism: {{text}}. Identify any passages that are similar to existing sources and provide links to the original content. Highlight the plagiarized text and provide a similarity score for each instance in format 'Plagiarized text , Similarity score , Source ' .Example format:  'Plagiarized text: /This is an example of plagiarized text./ , Similarity score: 95%, Source: https://www-example-com.cdn.ampproject.org/c/s/www.example.com'.",
+        "outputParsingPattern": " Plagiarized text: \"(.*?)\", Similarity score: (.*?), Source: (.*?)",
         "outputParsingReplacement": {
-            "highlighted_text": "$1",
-            "errors": "$2"
+            "plagiarized_text": "$1",
+            "similarity_score": "$2",
+            "source_url": "$3"
         }
-    },
+  },
     "text_completion": {
-        "prompt": "Complete the following text and highlight your additions. Provide the result in the format 'highlighted_text: *completed text*' and 'errors: added -> added text'. Example format: 'highlighted_text: This is a *new sentence* errors: new sentence -> This is a new sentence.' Here is the text: {{text}}",
-        "outputParsingPattern": "highlighted_text: (.*?) errors: (.*)$",
+        "prompt": "Complete the following text: {{incomplete_text}} in a way that is consistent with the style and tone of the original text. Ensure that the completion is grammatically correct, meaningful, and relevant to the context.Example:  Completed text: The cat sat on the mat, basking in the warm sunlight.",
+        "outputParsingPattern": "Completed text: \"(.*?)\"",
         "outputParsingReplacement": {
-            "highlighted_text": "$1",
-            "errors": "$2"
+            "completed_text": "$1"
         }
     },
     "paraphrasing": {
-        "prompt": " Paraphrase the following text. Highlight the paraphrased parts and provide the original to paraphrased mapping in the format 'original -> paraphrased'. Example format: 'highlighted_text: This is a *rephrased sentence* errors: rephrased sentence -> This is a rephrased sentence.' Here is the text: {{text}}",
-        "outputParsingPattern": "highlighted_text: (.*?) errors: (.*)$",
+        "prompt": "Paraphrase the following text: {{text}} while maintaining the original meaning but using different words and phrases. Ensure that the paraphrased text is grammatically correct, easy to understand, and conveys the same message as the original text. And remember i just want the Paraphrased text to be sendback. Example: Paraphrased text: A radiant sun beamed down from a clear blue sky.",
+        "outputParsingPattern":  " Paraphrased text: \"(.*?)\"",
         "outputParsingReplacement": {
-            "highlighted_text": "$1",
-            "errors": "$2"
+            "paraphrased_text": "$1"
         }
     }
 }

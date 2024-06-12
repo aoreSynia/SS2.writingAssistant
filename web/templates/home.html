@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -37,6 +37,13 @@
     <div id="raw-output" style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;">
         <strong>Raw Output:</strong>
         <pre id="raw-output-content" style="background-color: #f8f8f8; padding: 10px;"></pre>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <button onclick="processText('grammar_check')">Grammar Check</button>
+        <button onclick="processText('plagiarism_check')">Plagiarism Check</button>
+        <button onclick="processText('text_completion')">Text Completion</button>
+        <button onclick="processText('paraphrasing')">Paraphrasing</button>
     </div>
 
     <script>
@@ -77,7 +84,11 @@
                         console.error("Error: ", result.error);
                         statusDiv.textContent = 'Error processing request.';
                     } else {
-                        highlightErrors(result.highlighted_text, result.errors);
+                        if (action === 'grammar_check') {
+                            highlightErrors(result.highlighted_text, result.errors);
+                        } else {
+                            contentDiv.innerHTML = `<p>${result.highlighted_text}</p>`;
+                        }
                         statusDiv.textContent = 'Processing complete.';
                     }
                 } else {
@@ -121,6 +132,59 @@
                     });
                 });
             }
+        });
+    </script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Services Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Services Dashboard</h1>
+        <form id="ai-service-form">
+            <div>
+                <label for="contents">Input Text:</label>
+                <textarea id="contents" name="contents" rows="5" cols="50" required></textarea>
+            </div>
+            <div>
+                <label for="action">Select Action:</label>
+                <select id="action" name="action">
+                    <option value="grammar_check">Grammar Check</option>
+                    <option value="plagiarism_check">Plagiarism Check</option>
+                    <option value="text_completion">Text Completion</option>
+                    <option value="paraphrasing">Paraphrasing</option>
+                </select>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <h2>Response</h2>
+        <pre id="response"></pre>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#ai-service-form').on('submit', function(event) {
+                event.preventDefault();
+                const action = $('#action').val();
+                const contents = $('#contents').val();
+                $.ajax({
+                    url: '/api/' + action,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ contents: contents }),
+                    success: function(response) {
+                        $('#response').text(JSON.stringify(response, null, 2));
+                    },
+                    error: function(xhr, status, error) {
+                        $('#response').text(`Error: ${xhr.responseText}`);
+                    }
+                });
+            });
         });
     </script>
 </body>
