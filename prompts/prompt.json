@@ -1,6 +1,6 @@
 {
     "grammar_check": {
-        "prompt": "Check grammar and spelling in the following text: {{text}}. Highlight errors with *incorrect part* and provide corrections in the format 'start:{{all the spaces include character and white space }}:end:{{start + characters of incorrect}}:incorrect: *incorrect part* :suggestion: *suggestion* :error_type: {{errorType}} :severity: {{severity}}'. Example format: 'start: 0, end: 2, incorrect: *he*, suggestion: *He*, error_type: grammar, severity: minor'.",
+        "prompt": "Check grammar and spelling in the following text: {{text}}. Highlight errors with asterisk *incorrect part* and provide corrections in the format 'start, end, incorrect, suggestion, error_type, severity'. Example format: 'start: 0, end: 2, incorrect: *he*, suggestion: *He*, error_type: grammar, severity: minor'.",
         "outputParsingPattern": "start: (\\d+), end: (\\d+), incorrect: \\*(.*?)\\*, suggestion: \\*(.*?)\\*, error_type: (.*?), severity: (.*?)",
         "outputParsingReplacement": {
             "start": "$1",
@@ -10,8 +10,7 @@
             "error_type": "$5",
             "severity": "$6"
         }
-        }
-,
+    },
     "plagiarism_check": {
         "prompt": "Check the following text for plagiarism: {{text}}. Identify any passages that are similar to existing sources and provide links to the original content. Highlight the plagiarized text and provide a similarity score for each instance in format 'Plagiarized text , Similarity score , Source ' .Example format:  'Plagiarized text: /This is an example of plagiarized text./ , Similarity score: 95%, Source: https://www-example-com.cdn.ampproject.org/c/s/www.example.com'.",
         "outputParsingPattern": " Plagiarized text: \"(.*?)\", Similarity score: (.*?), Source: (.*?)",
