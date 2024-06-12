@@ -1,84 +1,58 @@
 import os
-import pathlib
+from flask import Flask, redirect, url_for, session, render_template, request, jsonify
+from google_auth_service.google_auth import google_auth_bp
+from ai_services.ai_services import configure_genai, grammar_check, check_plagiarism, complete_text, paraphrase_text
 
-import requests
-from flask import Flask, session, abort, redirect, request
-from google.oauth2 import id_token
-from google_auth_oauthlib.flow import Flow
-from pip._vendor import cachecontrol
-import google.auth.transport.requests
-
-app = Flask("Google Login App")
-app.secret_key = "CodeSpecialist.com"
-
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-
-GOOGLE_CLIENT_ID = "48603665006-p0tkod3fl4iskfs52b8ear7ruhgg5acu.apps.googleusercontent.com"
-client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
-
-flow = Flow.from_client_secrets_file(
-    client_secrets_file=client_secrets_file,
-    scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
-    redirect_uri="http://127.0.0.1:5000/callback"
+app = Flask(
+    __name__, 
+    template_folder="web/templates", 
+    static_folder="web/static"
 )
+app.secret_key = "1"
 
+# Initialize generative AI
+configure_genai(os.environ["API_KEY"])
 
-def login_is_required(function):
-    def wrapper(*args, **kwargs):
-        if "google_id" not in session:
-            return abort(401)  # Authorization required
-        else:
-            return function()
-
-    return wrapper
-
-
-@app.route("/login")
-def login():
-    authorization_url, state = flow.authorization_url()
-    session["state"] = state
-    return redirect(authorization_url)
-
-
-@app.route("/callback")
-def callback():
-    flow.fetch_token(authorization_response=request.url)
-
-    if not session["state"] == request.args["state"]:
-        abort(500)  # State does not match!
-
-    credentials = flow.credentials
-    request_session = requests.session()
-    cached_session = cachecontrol.CacheControl(request_session)
-    token_request = google.auth.transport.requests.Request(session=cached_session)
-
-    id_info = id_token.verify_oauth2_token(
-        id_token=credentials._id_token,
-        request=token_request,
-        audience=GOOGLE_CLIENT_ID
-    )
-
-    session["google_id"] = id_info.get("sub")
-    session["name"] = id_info.get("name")
-    return redirect("/protected_area")
-
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/")
-
+# Register Blueprints
+app.register_blueprint(google_auth_bp, url_prefix="/")
 
 @app.route("/")
 def index():
-    return "Hello World <a href='/login'><button>Login</button></a>"
+    return redirect(url_for("google_auth.homepage"))
 
+@app.route("/dashboard")
+def dashboard():
+    if 'user' not in session:
+        return redirect(url_for("google_auth.homepage"))
+    activities = session.get('activity', [])
+    return render_template('dashboard.html', activities=activities)
 
-@app.route("/protected_area")
-@login_is_required
-def protected_area():
-    return f"Hello {session['name']}! <br/> <a href='/logout'><button>Logout</button></a>"
+@app.route('/api/<action>', methods=['POST'])
+def api(action):
+    data = request.json
+    content = data.get('contents')
+    result = {"errors": [], "highlighted_text": ""}
+    
+    if not content:
+        return jsonify({"error": "No content provided"}), 400
+    
+    try:
+        if action == 'grammar_check':
+            result = grammar_check(content)
+        elif action == 'plagiarism_check':
+            result = check_plagiarism(content)
+        elif action == 'text_completion':
+            result = complete_text(content)
+        elif action == 'paraphrasing':
+            result = paraphrase_text(content)
+        else:
+            return jsonify({'error': 'Invalid action'}), 400
+    except Exception as e:
+        print(f"Error processing request: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
