@@ -1,4 +1,3 @@
-import json
 import os
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify
 from google_auth_service.google_auth import google_auth_bp
