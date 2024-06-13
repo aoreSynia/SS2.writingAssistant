@@ -45,7 +45,9 @@ def login():
 @google_auth_bp.route('/auth')
 def auth():
     token = oauth.google.authorize_access_token()
-    session['user'] = token['userinfo']
+    user_info = token['userinfo']
+    session['user'] = user_info
+    session['user_id'] = user_info['sub']
     return redirect('/')
 
 

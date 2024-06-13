@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>User Activity Dashboard</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>Input Text</th>
+                <th>Output</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for activity in activities %}
+                <tr>
+                    <td>{{ activity.action }}</td>
+                    <td>{{ activity.input_text }}</td>
+                    <td>{{ activity.output_text }}</td>
+                    <td>{{ activity.timestamp }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

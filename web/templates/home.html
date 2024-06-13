@@ -1,170 +1,41 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Real-Time Grammar Check</title>
-    <style>
-        .f1empge3 {
-            background-position: center calc(100% + 2px);
-            background-repeat: no-repeat;
-            border-bottom: 2px solid #EA1537;
-            contain: layout style;
-            padding-bottom: 1px;
-            transition: border-bottom-color .5s linear;
-        }
-
-        .status {
-            margin-top: 10px;
-            font-style: italic;
-        }
-
-        .tooltip {
-            display: none;
-            position: absolute;
-            background-color: #333;
-            color: #fff;
-            padding: 5px;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="_b4dbc6b7-denali-editor-editor ql-editor" contentEditable="true" spellcheck="false" id="content" style="width: 100%; height: 200px; border: 1px solid #ccc; padding: 10px;">
-        <p>he deeper trough is he</p>
-    </div>
-    <div class="status" id="status"></div>
-    <div class="tooltip" id="tooltip"></div>
-    <div id="raw-output" style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;">
-        <strong>Raw Output:</strong>
-        <pre id="raw-output-content" style="background-color: #f8f8f8; padding: 10px;"></pre>
-    </div>
-    
-    <div style="margin-top: 20px;">
-        <button onclick="processText('grammar_check')">Grammar Check</button>
-        <button onclick="processText('plagiarism_check')">Plagiarism Check</button>
-        <button onclick="processText('text_completion')">Text Completion</button>
-        <button onclick="processText('paraphrasing')">Paraphrasing</button>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const contentDiv = document.getElementById('content');
-            const statusDiv = document.getElementById('status');
-            const rawOutputDiv = document.getElementById('raw-output-content');
-            const tooltip = document.getElementById('tooltip');
-
-            let debounceTimeout;
-
-            contentDiv.addEventListener('input', () => {
-                clearTimeout(debounceTimeout);
-                statusDiv.textContent = 'Waiting for you to stop typing...';
-                debounceTimeout = setTimeout(() => {
-                    processText('grammar_check');
-                }, 2000);  // Trigger after 2 seconds of no typing
-            });
-
-            async function processText(action) {
-                const content = contentDiv.innerText;
-                statusDiv.textContent = 'Sending request to backend...';
-                
-                const response = await fetch(`/api/${action}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ contents: content })
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    statusDiv.textContent = 'Response received. Processing...';
-                    rawOutputDiv.textContent = JSON.stringify(result, null, 2);
-
-                    if (result.error) {
-                        console.error("Error: ", result.error);
-                        statusDiv.textContent = 'Error processing request.';
-                    } else {
-                        if (action === 'grammar_check') {
-                            highlightErrors(result.highlighted_text, result.errors);
-                        } else {
-                            contentDiv.innerHTML = `<p>${result.highlighted_text}</p>`;
-                        }
-                        statusDiv.textContent = 'Processing complete.';
-                    }
-                } else {
-                    console.error("Error: ", response.statusText);
-                    statusDiv.textContent = 'Error sending request to backend.';
-                }
-            }
-
-            function highlightErrors(text, errors) {
-                let highlightedText = '';
-                let lastIndex = 0;
-
-                errors.forEach(error => {
-                    const { start, end, suggestion } = error;
-                    highlightedText += text.slice(lastIndex, start);
-                    highlightedText += `<span class="f1empge3" data-suggestion="${suggestion}">${text.slice(start, end)}</span>`;
-                    lastIndex = end;
-                });
-
-                highlightedText += text.slice(lastIndex);
-                contentDiv.innerHTML = `<p>${highlightedText}</p>`;
-
-                attachTooltipHandlers();
-            }
-
-            function attachTooltipHandlers() {
-                const errorElements = document.querySelectorAll('.f1empge3');
-
-                errorElements.forEach((el) => {
-                    el.addEventListener('mouseover', (event) => {
-                        const suggestion = event.target.getAttribute('data-suggestion');
-                        tooltip.textContent = `Did you mean: ${suggestion}?`;
-                        const rect = event.target.getBoundingClientRect();
-                        tooltip.style.top = `${rect.top + window.scrollY + 20}px`;
-                        tooltip.style.left = `${rect.left + window.scrollX}px`;
-                        tooltip.style.display = 'block';
-                    });
-
-                    el.addEventListener('mouseout', () => {
-                        tooltip.style.display = 'none';
-                    });
-                });
-            }
-        });
-    </script>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>AI Services Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="web\static\styles.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>AI Services Dashboard</h1>
-        <form id="ai-service-form">
-            <div>
-                <label for="contents">Input Text:</label>
-                <textarea id="contents" name="contents" rows="5" cols="50" required></textarea>
+        {% if user %}
+            <a href="/logout" class="logout-btn">Logout</a>
+            <a href="/dashboard" class="dashboard-btn">Dashboard</a>
+            <form id="ai-service-form">
+                <div>
+                    <label for="contents">Input Text:</label>
+                    <textarea id="contents" name="contents" rows="5" cols="50" required></textarea>
+                </div>
+                <div>
+                    <label for="action">Select Action:</label>
+                    <select id="action" name="action">
+                        <option value="grammar_check">Grammar Check</option>
+                        <option value="plagiarism_check">Plagiarism Check</option>
+                        <option value="text_completion">Text Completion</option>
+                        <option value="paraphrasing">Paraphrasing</option>
+                    </select>
+                </div>
+                <button type="submit">Submit</button>
+            </form>
+            <h2>Response</h2>
+            <pre id="response"></pre>
+        {% else %}
+            <div style="text-align: center;">
+                <a href="/login" class="login-btn">Login with Google</a>
             </div>
-            <div>
-                <label for="action">Select Action:</label>
-                <select id="action" name="action">
-                    <option value="grammar_check">Grammar Check</option>
-                    <option value="plagiarism_check">Plagiarism Check</option>
-                    <option value="text_completion">Text Completion</option>
-                    <option value="paraphrasing">Paraphrasing</option>
-                </select>
-            </div>
-            <button type="submit">Submit</button>
-        </form>
-        <h2>Response</h2>
-        <pre id="response"></pre>
+            <p style="text-align: center;">Please login to use the AI services.</p>
+        {% endif %}
     </div>
     <script>
         $(document).ready(function() {
