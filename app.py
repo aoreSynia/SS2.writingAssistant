@@ -4,7 +4,7 @@ from flask import Flask, redirect, url_for, session, render_template, request, j
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from google_auth_service.google_auth import google_auth_bp
-from ai_services.ai_services import configure_genai, grammar_check, check_plagiarism, complete_text, paraphrase_text
+from ai_services.ai_services import configure_genai, grammar_check, check_plagiarism, complete_text, paraphrase_text, generate_content
 from models import db, log_user_activity, log_activity_result, UserActivity
 
 # Initialize Flask app
@@ -66,6 +66,8 @@ def api(action):
     try:
         if action == 'grammar_check':
             result = grammar_check(content)
+            result_todb = generate_content('grammar_check', content)
+            log_user_activity(session.get('user_id'), action, 'Activity performed', content, result_todb)
         elif action == 'plagiarism_check':
             result = check_plagiarism(content)
         elif action == 'text_completion':
@@ -75,8 +77,10 @@ def api(action):
         else:
             return jsonify({'error': 'Invalid action'}), 400
 
-        # Log both the input and output
-        log_user_activity(session.get('user_id'), action, 'Activity performed', content, json.dumps(result))
+        # For actions other than grammar_check, you might want to log differently
+        if action != 'grammar_check':
+            log_user_activity(session.get('user_id'), action, 'Activity performed', content, json.dumps(result))
+
     except Exception as e:
         print(f"Error processing request: {e}")
         return jsonify({"error": "Internal server error"}), 500
