@@ -5,47 +5,40 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from google_auth_service.google_auth import google_auth_bp
 from ai_services.ai_services import configure_genai, grammar_check, check_plagiarism, complete_text, paraphrase_text
-from models import db, Activity  # Importing db and Activity from models.py
+from models import db, log_user_activity, log_activity_result, UserActivity
 
+# Initialize Flask app
 app = Flask(
     __name__,
     template_folder="web/templates",
     static_folder="web/static",
-    instance_relative_config=True  # Tells Flask that config files are relative to the instance folder
+    instance_relative_config=True
 )
 
-app.secret_key = "1"
+# Load configuration from environment variables
+app.secret_key = os.environ.get('SECRET_KEY', 'default_secret_key')
 db_path = os.path.join(app.instance_path, 'activities.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Ensure instance folder exists
+if not os.path.exists(app.instance_path):
+    os.makedirs(app.instance_path)
+
+# Initialize the database with the app
 db.init_app(app)
 
+# Create database tables before the first request
 with app.app_context():
     db.create_all()
+
 # Initialize OpenAI
 configure_genai(os.environ["API_KEY"])
 
 # Register Blueprints
 app.register_blueprint(google_auth_bp, url_prefix="/")
 
-# @app.before_first_request
-# def create_tables():
-#     db.create_all()
-def log_activity(action, input_text=None, output_text=None):
-    from flask import session
-    user_id = session.get('user_id')
-    if not user_id:
-        raise ValueError("User must be logged in to log activity")
-    activity = Activity(
-        user_id=user_id,
-        action=action,
-        input_text=input_text,
-        output_text=output_text
-    )
-    db.session.add(activity)
-    db.session.commit()
-
+# Routes
 @app.route("/")
 def index():
     return redirect(url_for("google_auth.homepage"))
@@ -55,22 +48,21 @@ def dashboard():
     if 'user' not in session:
         return redirect(url_for("google_auth.homepage"))
     user_info = session['user']
-    
     user_id = session.get('user_id')
     user_name = user_info.get('name', 'Unknown')
-    
-    activities = Activity.query.filter_by(user_id=user_id).order_by(Activity.timestamp.desc()).all()
-    return render_template('dashboard.html', activities=activities, user_name=user_name)
+    activities = db.session.query(UserActivity).filter_by(user_id=user_id).order_by(UserActivity.timestamp.desc()).all()
+    activities_dict = [activity.to_dict() for activity in activities]  # Convert to dict
+    print(f"Activities fetched: {activities_dict}")  # Debugging
+    return render_template('dashboard.html', activities=activities_dict, user_name=user_name)
 
 @app.route('/api/<action>', methods=['POST'])
 def api(action):
     data = request.json
     content = data.get('contents')
-    result = {"errors": [], "highlighted_text": ""}
-
     if not content:
         return jsonify({"error": "No content provided"}), 400
 
+    result = {}
     try:
         if action == 'grammar_check':
             result = grammar_check(content)
@@ -82,15 +74,9 @@ def api(action):
             result = paraphrase_text(content)
         else:
             return jsonify({'error': 'Invalid action'}), 400
-        
-        new_activity = Activity(
-            user_id= session.get('user_id'),
-            action=action,
-            input_text=content,
-            output_text=json.dumps(result)
-        )
-        db.session.add(new_activity)
-        db.session.commit()
+
+        # Log both the input and output
+        log_user_activity(session.get('user_id'), action, 'Activity performed', content, json.dumps(result))
     except Exception as e:
         print(f"Error processing request: {e}")
         return jsonify({"error": "Internal server error"}), 500
@@ -98,9 +84,5 @@ def api(action):
     return jsonify(result)
 
 if __name__ == "__main__":
-    # Ensure instance folder exists
-    if not os.path.exists('instance'):
-        os.makedirs('instance')
-
     # Run the Flask application
     app.run(debug=True)
