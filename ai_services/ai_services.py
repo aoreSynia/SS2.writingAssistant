@@ -22,6 +22,7 @@ def generate_content(prompt_type, text):
     print("generated_text: {", generated_text , "}")
     return generated_text
 
+
 # Grammar check function
 def grammar_check(text):
     output = generate_content('grammar_check', text)
@@ -54,7 +55,7 @@ def grammar_check(text):
             })
 
     print("results: ", results)
-    return json.dumps({"errors": results}, ensure_ascii=False)
+    return results
 
 # Check plagiarism function
 def check_plagiarism(text):

@@ -1,6 +1,6 @@
 {
     "grammar_check": {
-        "prompt": "Check grammar and spelling in the following text and provide the corrected version: @docs{{text}}.",
+        "prompt": "Check grammar and spelling in the following text and provide the corrected version: @docs{{text}}. just give me the corrected text and give no more addition text",
         "outputParsingPattern": "corrected_text: (.*?)",
         "outputParsingReplacement": {
             "corrected_text": "$1"
