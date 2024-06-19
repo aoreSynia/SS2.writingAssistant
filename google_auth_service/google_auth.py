@@ -9,6 +9,8 @@ from google.auth.transport.requests import Request
 import cachecontrol
 import google.auth.transport.requests
 
+from models import User, UserActivity, db, log_user_activity, log_activity_result
+
 google_auth_bp = Blueprint("google_auth", __name__)
 
 app = Flask(
@@ -45,7 +47,22 @@ def login():
 @google_auth_bp.route('/auth')
 def auth():
     token = oauth.google.authorize_access_token()
-    session['user'] = token['userinfo']
+    user_info = token['userinfo']
+    session['user'] = user_info
+    session['user_id'] = user_info['sub']
+
+    if user_info:
+        user = User.query.filter_by(user_id=user_info['sub']).first()
+        if not user:
+            user = User(
+                user_id=user_info['sub'],
+                email=user_info['email'],
+                full_name=user_info['name']
+            )
+            db.session.add(user)
+            db.session.commit()
+        session['user'] = user_info
+        session['user_id'] = user.id
     return redirect('/')
 
 

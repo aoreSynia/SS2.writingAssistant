@@ -1,73 +1,93 @@
 body {
     font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 h1 {
     text-align: center;
-    margin-top: 20px;
-    color: #444;
 }
 
-p {
-    text-align: center;
-    font-size: 1.2em;
-}
-
-a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-.container {
-    width: 80%;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1em;
+form {
     margin-bottom: 20px;
 }
 
-button {
+form div {
+    margin-bottom: 10px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+form textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+form select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+form button {
     padding: 10px 20px;
-    border: none;
-    background-color: #007bff;
+    font-size: 14px;
+    background-color: #4CAF50;
     color: white;
-    font-size: 1em;
+    border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin: 5px;
 }
 
-button:hover {
-    background-color: #0056b3;
-}
-
-#output {
-    white-space: pre-wrap;
-    background-color: #e9ecef;
+#response {
+    background-color: #f9f9f9;
     padding: 10px;
+    border: 1px solid #ccc;
     border-radius: 4px;
-    border: 1px solid #ddd;
-    margin-top: 20px;
+    white-space: pre-wrap;
 }
 
-.hidden {
-    display: none;
+.logout-btn {
+    float: right;
+    margin-top: -50px;
+    margin-right: 20px;
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.dashboard-btn {
+    float: right;
+    margin-top: -50px;
+    margin-right: 20px;
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }

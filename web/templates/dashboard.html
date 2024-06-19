@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        main {
+            padding: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome, {{ user_name }}!</h1>
+        <a href="{{ url_for('google_auth.logout') }}">Logout</a>
+    </header>
+    <main>
+        <h2>Your Activities</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Input</th>
+                    <th>Output</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in activities %}
+                <tr>
+                    <td>{{ activity.activity_type }}</td>
+                    <td>{{ activity.input_data }}</td>
+                    <td>{{ activity.output_data }}</td>
+                    <td>{{ activity.timestamp }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Debug Information</h2>
+        <ul>
+            {% for activity in activities %}
+            <li>
+                <pre>{{ activity | tojson(indent=2) }}</pre>
+            </li>
+            {% endfor %}
+        </ul>
+    </main>
+</body>
+</html>
