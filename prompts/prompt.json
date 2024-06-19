@@ -16,7 +16,7 @@
         }
     },
     "text_completion": {
-        "prompt": "Complete the following text: @docs{{text}} in a way that is consistent with the style and tone of the original text. Ensure that the completion is grammatically correct, meaningful, and relevant to the context. Example: Completed text: The cat sat on the mat, basking in the warm sunlight.",
+        "prompt": "Complete the following text: @docs{{text}}... in a way that is consistent with the style and tone of the original text. Ensure that the completion is grammatically correct, meaningful, and relevant to the context. Example: Completed text: The cat sat on the mat, basking in the warm sunlight.",
         "outputParsingPattern": "Completed text: \"(.*?)\"",
         "outputParsingReplacement": {
             "completed_text": "$1"
