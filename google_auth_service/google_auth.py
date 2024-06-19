@@ -30,7 +30,9 @@ oauth.register(
         'scope': 'openid email profile'
     }
 )
-
+# @google_auth_bp.route('/loginform')
+# def login_form():
+#     render_template('login.html')
 
 @google_auth_bp.route('/')
 def homepage():
@@ -70,3 +72,5 @@ def auth():
 def logout():
     session.pop('user', None)
     return redirect('/')
+
+

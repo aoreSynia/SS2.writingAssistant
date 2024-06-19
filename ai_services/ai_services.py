@@ -16,11 +16,12 @@ def generate_content(prompt_type, text):
     prompt_template = prompts[prompt_type]
     prompt = prompt_template['prompt'].replace("@docs{{text}}", text)
 
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content([prompt])
     generated_text = response.candidates[0].content.parts[0].text
     print("generated_text: {", generated_text , "}")
     return generated_text
+
 
 # Grammar check function
 def grammar_check(text):
@@ -54,7 +55,7 @@ def grammar_check(text):
             })
 
     print("results: ", results)
-    return json.dumps({"errors": results}, ensure_ascii=False)
+    return results
 
 # Check plagiarism function
 def check_plagiarism(text):
