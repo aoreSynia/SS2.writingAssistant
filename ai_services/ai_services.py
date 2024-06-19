@@ -16,7 +16,7 @@ def generate_content(prompt_type, text):
     prompt_template = prompts[prompt_type]
     prompt = prompt_template['prompt'].replace("@docs{{text}}", text)
 
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content([prompt])
     generated_text = response.candidates[0].content.parts[0].text
     print("generated_text: {", generated_text , "}")
